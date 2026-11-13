@@ -1,0 +1,692 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Sistema de diseño del Mapa del Desempleo en Chile: producto, tokens, componentes, patrones, estados y reglas editoriales.">
+  <meta name="theme-color" content="#f6f4ee">
+  <title>Design System · Mapa del Desempleo en Chile</title>
+  <style>
+    :root {
+      --color-ink: #16252e;
+      --color-muted: #53636d;
+      --color-accent: #0e615a;
+      --color-accent-dark: #0b4945;
+      --color-accent-soft: #d9eeea;
+      --color-canvas: #f6f4ee;
+      --color-surface: #ffffff;
+      --color-border: #d9e0dc;
+      --color-warning: #7a4b00;
+      --color-warning-bg: #fff1d6;
+      --color-danger: #9b2c2c;
+      --color-danger-bg: #fce8e6;
+      --shadow-card: 0 12px 34px rgba(22,37,46,.07);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 24px;
+      --space-6: 32px;
+      --space-7: 48px;
+      --content-max: 1180px;
+      --font-body: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --font-display: Georgia, "Times New Roman", serif;
+      color-scheme: light;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 88px; }
+    body { margin: 0; background: var(--color-canvas); color: var(--color-ink); font-family: var(--font-body); line-height: 1.55; }
+    a { color: var(--color-accent-dark); text-underline-offset: 3px; }
+    a:hover { text-decoration-thickness: 2px; }
+    button, input, select { font: inherit; }
+    button, a, input, select { outline-offset: 3px; }
+    :focus-visible { outline: 3px solid #b15a00; outline-offset: 3px; }
+    .skip-link { position: absolute; left: 12px; top: -70px; z-index: 99; padding: 10px 14px; background: white; border: 2px solid var(--color-accent); border-radius: 8px; }
+    .skip-link:focus { top: 12px; }
+    .site-header { background: var(--color-surface); border-bottom: 1px solid var(--color-border); }
+    .header-inner { max-width: var(--content-max); margin: auto; padding: 22px 28px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+    .brand-mark { width: 42px; height: 42px; flex: 0 0 42px; display: grid; place-items: center; color: white; background: var(--color-accent); border-radius: 13px; font-weight: 800; letter-spacing: -.06em; }
+    .brand-name { margin: 0; font-weight: 800; font-size: 14px; letter-spacing: .03em; line-height: 1.2; }
+    .brand-sub { margin: 4px 0 0; font-size: 12px; color: var(--color-muted); }
+    .version-pill, .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
+    .version-pill { border: 1px solid var(--color-border); border-radius: 999px; padding: 7px 11px; color: var(--color-muted); white-space: nowrap; }
+    .hero { max-width: var(--content-max); margin: auto; padding: 48px 28px 38px; }
+    .eyebrow { color: var(--color-accent); margin: 0 0 10px; }
+    h1, h2, h3, h4, p { overflow-wrap: anywhere; }
+    h1 { max-width: 850px; margin: 0; font: 500 clamp(38px, 6vw, 64px)/.99 var(--font-display); letter-spacing: -.045em; }
+    .hero-copy { max-width: 700px; color: var(--color-muted); font-size: 17px; margin: 18px 0 0; }
+    .hero-meta { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+    .meta-chip { display: inline-flex; gap: 7px; align-items: center; background: #e9efeb; padding: 7px 11px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+    .status-banner { max-width: var(--content-max); margin: 0 auto 24px; padding: 0 28px; }
+    .status-inner { background: var(--color-warning-bg); border: 1px solid #e7c98e; border-radius: var(--radius-md); padding: 17px 19px; display: grid; grid-template-columns: 28px 1fr; gap: 12px; color: #4b3308; }
+    .status-icon { width: 26px; height: 26px; display: grid; place-items: center; border: 1.5px solid currentColor; border-radius: 50%; font-weight: 900; }
+    .status-inner strong { display: block; margin-bottom: 3px; }
+    .status-inner p { margin: 0; font-size: 13px; }
+    .status-inner a { color: #4b3308; font-weight: 800; }
+    .layout { max-width: var(--content-max); margin: 0 auto; padding: 0 28px 70px; display: grid; grid-template-columns: 230px minmax(0,1fr); gap: 32px; align-items: start; }
+    .sidebar { position: sticky; top: 18px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 18px 12px; box-shadow: 0 4px 16px rgba(22,37,46,.03); }
+    .sidebar-title { margin: 0 8px 11px; color: var(--color-muted); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .14em; }
+    .nav-list { display: grid; gap: 3px; }
+    .nav-list a { text-decoration: none; color: var(--color-muted); font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 9px; padding: 9px 10px; border-radius: 8px; }
+    .nav-list a:hover, .nav-list a.active { color: var(--color-accent-dark); background: var(--color-accent-soft); }
+    .nav-num { color: #82918d; font-variant-numeric: tabular-nums; width: 18px; }
+    main { min-width: 0; }
+    .section { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-lg); margin-bottom: 22px; padding: clamp(22px, 4vw, 34px); box-shadow: var(--shadow-card); scroll-margin-top: 20px; }
+    .section-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; margin-bottom: 23px; }
+    .section-kicker { margin: 0 0 6px; font-size: 10px; color: var(--color-accent); letter-spacing: .14em; font-weight: 900; text-transform: uppercase; }
+    h2 { font: 500 clamp(27px,3.8vw,38px)/1.05 var(--font-display); letter-spacing: -.035em; margin: 0; }
+    h3 { margin: 0 0 10px; font-size: 16px; line-height: 1.25; }
+    h4 { font-size: 13px; margin: 0 0 7px; }
+    .section-intro { color: var(--color-muted); max-width: 750px; margin: 10px 0 0; font-size: 14px; }
+    .section-number { font: 500 32px/1 var(--font-display); color: #b8c5c0; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; }
+    .panel { border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 16px; min-width: 0; }
+    .panel.soft { background: #f7faf8; }
+    .panel.dark { background: var(--color-ink); color: white; border-color: var(--color-ink); }
+    .panel.dark p, .panel.dark small { color: #d3dedb; }
+    .panel p { margin: 0; font-size: 13px; color: var(--color-muted); }
+    .panel-label { font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; color: var(--color-muted); margin-bottom: 8px; }
+    .dark .panel-label { color: #b8d8d1; }
+    .casilla { min-height: 150px; display: flex; flex-direction: column; gap: 8px; }
+    .casilla-num { width: 25px; height: 25px; display: grid; place-items: center; border-radius: 50%; background: var(--color-accent-soft); color: var(--color-accent-dark); font-size: 11px; font-weight: 900; }
+    .casilla h3 { font-size: 14px; margin: 0; }
+    .casilla p { font-size: 12px; }
+    .note { border-left: 3px solid var(--color-accent); background: #f3f8f6; padding: 13px 15px; border-radius: 0 10px 10px 0; font-size: 13px; color: var(--color-muted); }
+    .note strong { color: var(--color-ink); }
+    .principle { display: flex; gap: 12px; align-items: flex-start; border-bottom: 1px solid var(--color-border); padding: 13px 0; }
+    .principle:last-child { border-bottom: 0; }
+    .principle-icon { width: 30px; height: 30px; flex: 0 0 30px; display: grid; place-items: center; border-radius: 9px; background: var(--color-accent-soft); color: var(--color-accent-dark); font-weight: 900; }
+    .principle p { margin: 0; color: var(--color-muted); font-size: 13px; }
+    .token-group { margin-top: 19px; }
+    .token-group:first-child { margin-top: 0; }
+    .token-group-title { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; padding-bottom: 9px; border-bottom: 1px solid var(--color-border); margin-bottom: 12px; }
+    .token-group-title h3 { margin: 0; font-size: 14px; }
+    .token-group-title span { color: var(--color-muted); font-size: 11px; }
+    .swatch-grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 9px; }
+    .swatch { border: 1px solid var(--color-border); border-radius: 11px; overflow: hidden; }
+    .swatch-color { height: 58px; }
+    .swatch-info { padding: 9px; display: grid; gap: 2px; }
+    .swatch-info strong { font-size: 11px; }
+    .swatch-info code { font-size: 10px; color: var(--color-muted); }
+    .swatch-info button { justify-self: start; border: 0; background: transparent; color: var(--color-accent-dark); padding: 3px 0 0; cursor: pointer; font-size: 10px; font-weight: 800; }
+    .type-sample { display: flex; align-items: baseline; justify-content: space-between; border-bottom: 1px solid var(--color-border); padding: 10px 0; gap: 12px; }
+    .type-sample:last-child { border: 0; }
+    .type-sample span:last-child { color: var(--color-muted); font-size: 11px; white-space: nowrap; }
+    .space-row { display: grid; grid-template-columns: 65px 1fr 40px; gap: 10px; align-items: center; padding: 7px 0; }
+    .space-row code { font-size: 11px; }
+    .space-bar { height: 9px; border-radius: 99px; background: var(--color-accent); }
+    .space-row span { font-size: 11px; color: var(--color-muted); text-align: right; }
+    .button-row { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+    .btn { min-height: 40px; border-radius: 9px; padding: 9px 14px; border: 1px solid var(--color-accent); background: var(--color-accent); color: white; font-size: 12px; font-weight: 800; cursor: pointer; transition: background .16s, transform .16s; }
+    .btn:hover { background: var(--color-accent-dark); transform: translateY(-1px); }
+    .btn.secondary { color: var(--color-accent-dark); background: white; border-color: #a7c6bf; }
+    .btn.secondary:hover { background: var(--color-accent-soft); }
+    .btn.tertiary { background: transparent; border-color: transparent; color: var(--color-accent-dark); text-decoration: underline; text-underline-offset: 3px; }
+    .btn:disabled { cursor: not-allowed; opacity: .48; transform: none; }
+    .tag { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 5px 9px; background: var(--color-accent-soft); color: var(--color-accent-dark); font-size: 10px; font-weight: 900; }
+    .tag.neutral { background: #eef1ef; color: #43515a; }
+    .tag.warning { background: var(--color-warning-bg); color: var(--color-warning); }
+    .tag.error { background: var(--color-danger-bg); color: var(--color-danger); }
+    .field { display: grid; gap: 6px; }
+    .field label { font-size: 11px; font-weight: 800; }
+    .field input, .field select { width: 100%; min-height: 42px; border: 1px solid #9eaca7; border-radius: 9px; padding: 9px 11px; color: var(--color-ink); background: white; }
+    .field small { font-size: 10px; color: var(--color-muted); }
+    .component-card { border: 1px solid var(--color-border); border-radius: 14px; padding: 15px; min-width: 0; }
+    .component-card h4 { margin-bottom: 7px; }
+    .component-rule { display: grid; gap: 6px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--color-border); font-size: 11px; }
+    .component-rule p { margin: 0; }
+    .use { color: var(--color-accent-dark); }
+    .avoid { color: var(--color-danger); }
+    .stat-card { background: var(--color-ink); color: white; border-radius: var(--radius-md); padding: 20px; }
+    .stat-card .small-label { color: #c4d6d0; font-size: 10px; text-transform: uppercase; letter-spacing: .12em; font-weight: 900; }
+    .stat-card .big-number { font: 500 clamp(42px,6vw,62px)/1 var(--font-display); letter-spacing: -.05em; margin: 12px 0 8px; font-variant-numeric: tabular-nums; }
+    .stat-card .detail { color: #e1eae7; font-size: 12px; }
+    .comparison { border: 1px solid var(--color-border); border-radius: 12px; padding: 14px; }
+    .compare-line { display: grid; grid-template-columns: 90px 1fr 52px; align-items: center; gap: 10px; margin: 10px 0; font-size: 11px; }
+    .bar-track { height: 9px; background: #e9eeeb; border-radius: 99px; overflow: hidden; }
+    .bar-fill { height: 100%; width: 0; background: var(--color-accent); border-radius: 99px; }
+    .compare-line strong { text-align: right; font-variant-numeric: tabular-nums; }
+    .map-layout { display: grid; grid-template-columns: minmax(150px,.75fr) minmax(0,1.25fr); gap: 16px; align-items: center; }
+    .schematic-map { border: 1px solid var(--color-border); border-radius: 14px; background: #f8faf9; padding: 15px; display: flex; justify-content: center; gap: 14px; min-height: 390px; }
+    .map-spine { width: 92px; display: grid; grid-template-rows: repeat(16,1fr); gap: 3px; transform: skewY(-5deg); }
+    .map-region { border: 1px solid rgba(11,73,69,.22); border-radius: 3px 10px 3px 10px; min-height: 14px; padding: 0 4px; color: #153a37; font-size: 8px; font-weight: 900; cursor: pointer; transition: outline .12s, transform .12s; }
+    .map-region:nth-child(3n+1) { width: 70%; justify-self: center; }
+    .map-region:nth-child(3n+2) { width: 88%; justify-self: center; }
+    .map-region:nth-child(3n) { width: 100%; justify-self: center; }
+    .map-region.selected { outline: 3px solid var(--color-ink); outline-offset: 1px; transform: scale(1.04); z-index: 1; }
+    .map-region:hover { filter: brightness(.94); }
+    .map-labels { display: grid; align-content: center; gap: 5px; color: var(--color-muted); font-size: 10px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 9px 14px; margin-top: 13px; font-size: 10px; color: var(--color-muted); }
+    .legend-item { display: inline-flex; align-items: center; gap: 6px; }
+    .legend-chip { width: 13px; height: 13px; border-radius: 3px; display: inline-block; border: 1px solid rgba(0,0,0,.1); }
+    .source-line { border: 1px solid var(--color-border); background: #f8faf9; border-radius: 11px; padding: 12px 13px; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; font-size: 11px; }
+    .source-line p { margin: 0; color: var(--color-muted); }
+    .source-line strong { color: var(--color-ink); }
+    .table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; min-width: 570px; font-size: 12px; }
+    th, td { text-align: left; padding: 11px 12px; border-bottom: 1px solid var(--color-border); }
+    th { background: #f2f6f3; color: var(--color-muted); font-size: 10px; text-transform: uppercase; letter-spacing: .07em; position: sticky; top: 0; }
+    td.num { font-variant-numeric: tabular-nums; text-align: right; }
+    tr:last-child td { border-bottom: 0; }
+    tr.selected-row { background: #eaf4f1; }
+    .table-select { border: 0; background: transparent; color: var(--color-accent-dark); font-weight: 800; cursor: pointer; padding: 0; text-decoration: underline; text-underline-offset: 3px; }
+    .preview-controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 13px; }
+    .preview-switch { border: 1px solid var(--color-border); background: white; color: var(--color-muted); padding: 7px 11px; border-radius: 999px; font-size: 11px; font-weight: 800; cursor: pointer; }
+    .preview-switch[aria-pressed="true"] { color: white; background: var(--color-accent); border-color: var(--color-accent); }
+    .preview-stage { padding: 20px; background: #edf1ed; border-radius: 15px; display: flex; justify-content: center; overflow: auto; }
+    .preview-screen { width: 100%; max-width: 760px; background: white; border: 1px solid #cdd8d2; border-radius: 12px; padding: 23px; transition: max-width .2s; }
+    .preview-stage.mobile .preview-screen { max-width: 340px; border-radius: 27px; border: 6px solid #1b292f; padding: 19px 14px; }
+    .preview-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 10px; color: var(--color-muted); font-weight: 900; letter-spacing: .08em; }
+    .preview-title { font: 500 27px/1.05 var(--font-display); margin: 18px 0 7px; letter-spacing: -.03em; }
+    .preview-sub { color: var(--color-muted); font-size: 10px; margin: 0 0 15px; }
+    .preview-metrics { display: grid; grid-template-columns: 1.2fr 1fr; gap: 10px; }
+    .preview-primary { padding: 15px; background: var(--color-ink); color: white; border-radius: 11px; }
+    .preview-primary span { display: block; color: #c2d8d1; font-size: 8px; font-weight: 900; letter-spacing: .1em; }
+    .preview-primary strong { display: block; font: 500 42px/1 var(--font-display); margin: 8px 0; }
+    .preview-primary small { color: #e0e9e6; font-size: 9px; }
+    .preview-secondary { display: grid; gap: 8px; }
+    .mini-metric { background: #f1f6f3; border-radius: 9px; padding: 11px; }
+    .mini-metric span { display: block; font-size: 8px; color: var(--color-muted); }
+    .mini-metric strong { font-size: 20px; font-variant-numeric: tabular-nums; }
+    .preview-map { height: 85px; margin-top: 12px; border-radius: 9px; background: #f4f7f4; border: 1px solid var(--color-border); display: grid; place-items: center; color: var(--color-muted); font-size: 10px; }
+    .preview-foot { font-size: 8px; color: var(--color-muted); margin-top: 13px; border-top: 1px solid var(--color-border); padding-top: 9px; }
+    .state-card { min-height: 130px; display: flex; flex-direction: column; justify-content: center; gap: 8px; }
+    .spinner { width: 23px; height: 23px; border: 3px solid #dce8e4; border-top-color: var(--color-accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .state-error { background: var(--color-danger-bg); color: #632020; border-color: #e9c4c1; }
+    .empty-dash { width: 44px; height: 30px; border: 1px dashed #aab8b2; border-radius: 7px; display: grid; place-items: center; color: var(--color-muted); font-weight: 900; }
+    .voice-list { display: grid; gap: 10px; }
+    .voice-item { display: grid; grid-template-columns: 125px 1fr; gap: 12px; padding-bottom: 10px; border-bottom: 1px solid var(--color-border); font-size: 12px; }
+    .voice-item:last-child { border-bottom: 0; }
+    .voice-item strong { color: var(--color-accent-dark); }
+    .contrast-row { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--color-border); font-size: 11px; }
+    .contrast-row:last-child { border: 0; }
+    .contrast-ratio { font-variant-numeric: tabular-nums; font-weight: 900; }
+    .footer { background: var(--color-ink); color: white; padding: 28px; }
+    .footer-inner { max-width: var(--content-max); margin: auto; display: flex; justify-content: space-between; gap: 24px; align-items: flex-start; }
+    .footer p { margin: 4px 0 0; color: #d1dfda; font-size: 12px; max-width: 720px; }
+    .footer a { color: #b8e3d8; }
+    .small-muted { font-size: 11px; color: var(--color-muted); }
+    .mt-16 { margin-top: 16px; }
+    .mb-10 { margin-bottom: 10px; }
+    .no-margin { margin: 0; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+    @media (max-width: 900px) {
+      .layout { grid-template-columns: 1fr; gap: 18px; }
+      .sidebar { position: static; padding: 12px; }
+      .nav-list { display: flex; overflow-x: auto; padding-bottom: 3px; }
+      .nav-list a { white-space: nowrap; }
+      .sidebar-title { display: none; }
+      .grid-4 { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    @media (max-width: 620px) {
+      .header-inner, .hero, .status-banner, .layout { padding-left: 16px; padding-right: 16px; }
+      .header-inner { padding-top: 15px; padding-bottom: 15px; }
+      .version-pill { display: none; }
+      .hero { padding-top: 34px; }
+      .hero-copy { font-size: 15px; }
+      .status-inner { padding: 13px; }
+      .section { padding: 20px 16px; border-radius: 17px; }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
+      .swatch-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .map-layout { grid-template-columns: 1fr; }
+      .schematic-map { min-height: 330px; }
+      .map-spine { width: 100px; }
+      .section-head { margin-bottom: 17px; }
+      .section-number { font-size: 24px; }
+      .preview-metrics { grid-template-columns: 1fr; }
+      .preview-secondary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .voice-item { grid-template-columns: 1fr; gap: 3px; }
+      .footer-inner { display: block; }
+      .footer-inner > span { display: block; margin-top: 14px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">MD</div>
+        <div>
+          <p class="brand-name">MAPA DEL DESEMPLEO</p>
+          <p class="brand-sub">Sistema de diseño · Chile</p>
+        </div>
+      </div>
+      <span class="version-pill">Design system · v1.0 · Paz Meza</span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <p class="eyebrow">Manual de producto y de interfaz</p>
+    <h1>Una cifra clara.<br>Una fuente a la vista.</h1>
+    <p class="hero-copy">Sistema de diseño para una herramienta periodística que permite consultar y comparar la tasa de desocupación de las 16 regiones de Chile con datos de la Encuesta Nacional de Empleo del INE.</p>
+    <div class="hero-meta">
+      <span class="meta-chip">Producto · datos públicos</span>
+      <span class="meta-chip">Mobile first</span>
+      <span class="meta-chip">Atomic Design</span>
+      <span class="meta-chip">Edición individual · 2026</span>
+    </div>
+  </section>
+
+  <div class="status-banner" id="vigencia">
+    <div class="status-inner" role="status" aria-live="polite">
+      <span class="status-icon" aria-hidden="true">!</span>
+      <div>
+        <strong>Control de vigencia: el agente todavía entrega el Boletín 335</strong>
+        <p>El endpoint consultado devuelve junio-agosto de 2026 (publicado el 30-09-2026). El INE ya publicó el Boletín 336, julio-septiembre, el 29-10-2026: Biobío 10,5% (+0,4 pp.) y Chile 9,8%. Por transparencia, la demostración usa los datos exactos del agente y los identifica como tales; no los presenta como la última publicación del INE. <a href="https://regiones.ine.gob.cl/documentos/default-source/region-viii/estadisticas/ocupacion-y-desocupacion/boletines/2026/boletin-empleo-biobio-trimestre-movil-julio-septiembre-2026.pdf" target="_blank" rel="noopener">Boletín regional 336</a> · <a href="https://www.ine.gob.cl/sala-de-prensa/prensa/general/noticia/2026/10/29/la-tasa-de-desocupaci%C3%B3n-nacional-fue-9-8-en-el-trimestre-julio-septiembre-de-2026" target="_blank" rel="noopener">Boletín nacional 336</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar" aria-label="Índice del sistema de diseño">
+      <p class="sidebar-title">Índice del sistema</p>
+      <nav class="nav-list">
+        <a href="#producto" class="active"><span class="nav-num">01</span>El producto</a>
+        <a href="#principios"><span class="nav-num">02</span>Principios</a>
+        <a href="#tokens"><span class="nav-num">03</span>Tokens</a>
+        <a href="#atomos"><span class="nav-num">04</span>Átomos</a>
+        <a href="#moleculas"><span class="nav-num">05</span>Moléculas</a>
+        <a href="#organismos"><span class="nav-num">06</span>Organismos</a>
+        <a href="#plantillas"><span class="nav-num">07</span>Plantillas y páginas</a>
+        <a href="#estados"><span class="nav-num">08</span>Estados</a>
+        <a href="#datos-voz"><span class="nav-num">09</span>Datos y voz</a>
+        <a href="#accesibilidad-ia"><span class="nav-num">10</span>Accesibilidad e IA</a>
+      </nav>
+    </aside>
+
+    <main id="contenido">
+      <section class="section" id="producto">
+        <div class="section-head">
+          <div>
+            <p class="section-kicker">01 · Definición</p>
+            <h2>El producto</h2>
+            <p class="section-intro">La interfaz existe para responder una pregunta concreta: ¿cómo está el desempleo en mi región frente al promedio de Chile?</p>
+          </div>
+          <span class="section-number">01</span>
+        </div>
+        <div class="grid-2">
+          <article class="panel casilla"><span class="casilla-num">1</span><h3>Para quién</h3><p>Carolina, 38 años, vive en Concepción. Perdió su empleo en el verano y está buscando trabajo. Quiere saber si a su región le va peor o mejor que al resto del país.</p></article>
+          <article class="panel casilla"><span class="casilla-num">2</span><h3>Su problema</h3><p>Para conocer el desempleo en Biobío debe encontrar un boletín del INE, abrir un PDF extenso y localizar su región entre las tablas.</p></article>
+          <article class="panel casilla"><span class="casilla-num">3</span><h3>En cinco segundos</h3><p>«En mi región la desocupación está en X%, cambió N puntos porcentuales en doce meses y está sobre o bajo el promedio del país».</p></article>
+          <article class="panel casilla"><span class="casilla-num">4</span><h3>La primera pantalla</h3><p>Primero: tasa regional, variación interanual y comparación nacional. Después: mapa de las 16 regiones. Al pie: fuente, fecha y aprobación humana.</p></article>
+          <article class="panel casilla"><span class="casilla-num">5</span><h3>Lo que puede hacer</h3><p>Elegir una región, comparar su tasa con Chile y abrir la fuente de cada cifra. Descarga y chat quedan para una versión posterior.</p></article>
+          <article class="panel casilla"><span class="casilla-num">6</span><h3>Lo que hace el agente</h3><p>Automático: vigila al INE, extrae cifras, prepara un borrador y deja una traza. Humano: verifica, aprueba, firma y responde por lo publicado.</p></article>
+          <article class="panel casilla"><span class="casilla-num">7</span><h3>Lo que no promete</h3><p>No entrega datos por comuna, no atribuye causas que el INE no publica y no hace proyecciones. Cuando falta información, indica «No consta».</p></article>
+          <article class="panel casilla"><span class="casilla-num">8</span><h3>Por qué confiar</h3><p>Cada cifra enlaza a su boletín. Una persona aprueba antes de publicar y el producto declara cómo se utilizó inteligencia artificial.</p></article>
+        </div>
+        <div class="note mt-16"><strong>Decisión de versión 1:</strong> el producto prioriza tres datos —tasa regional, variación en doce meses y comparación nacional—. No incorpora chat, descarga, causas ni proyecciones.</div>
+        <div class="grid-2 mt-16">
+          <div class="panel soft">
+            <h3>Promesa editorial</h3>
+            <p>Hacer comprensible la cifra regional sin obligar a la persona a leer un boletín técnico completo.</p>
+          </div>
+          <div class="panel soft">
+            <h3>Límite editorial</h3>
+            <p>La tasa describe a la población y al territorio que mide la ENE. No explica por sí sola las causas del desempleo ni la experiencia laboral de cada persona.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="principios">
+        <div class="section-head"><div><p class="section-kicker">02 · Reglas no negociables</p><h2>Principios</h2><p class="section-intro">Reglas editoriales que guían tanto el contenido como el diseño de la interfaz.</p></div><span class="section-number">02</span></div>
+        <div class="grid-2">
+          <div>
+            <div class="principle"><span class="principle-icon">1</span><div><h3>Teléfono primero</h3><p>Diseñar primero el espacio pequeño. La información principal debe leerse sin ampliar ni desplazarse horizontalmente.</p></div></div>
+            <div class="principle"><span class="principle-icon">2</span><div><h3>Una cifra protagonista</h3><p>La tasa regional tiene la mayor jerarquía. La variación y la comparación explican la cifra; no compiten con ella.</p></div></div>
+            <div class="principle"><span class="principle-icon">3</span><div><h3>Toda cifra tiene fuente</h3><p>Mostrar institución, boletín, período y enlace verificable junto a los datos.</p></div></div>
+          </div>
+          <div>
+            <div class="principle"><span class="principle-icon">4</span><div><h3>Contraste suficiente</h3><p>Texto legible, foco visible y controles identificables. El color nunca es la única forma de comunicar un estado.</p></div></div>
+            <div class="principle"><span class="principle-icon">5</span><div><h3>El color no exagera</h3><p>Usar una escala cromática continua y una leyenda. No convertir una variación estadística en una señal de alarma.</p></div></div>
+            <div class="principle"><span class="principle-icon">6</span><div><h3>Los errores se explican</h3><p>Si faltan datos o el agente se atrasa, decirlo con claridad. Nunca reemplazar un dato ausente por una estimación inventada.</p></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="tokens">
+        <div class="section-head"><div><p class="section-kicker">03 · Fundaciones visuales</p><h2>Tokens</h2><p class="section-intro">Valores con nombre que se reutilizan en todos los componentes. Los componentes usan tokens semánticos, no colores elegidos al azar.</p></div><span class="section-number">03</span></div>
+        <div class="token-group">
+          <div class="token-group-title"><h3>Color</h3><span>Paleta principal · escala de petróleo/verde</span></div>
+          <div class="swatch-grid">
+            <div class="swatch"><div class="swatch-color" style="background:#16252e"></div><div class="swatch-info"><strong>Texto principal</strong><code>--color-ink · #16252E</code><button data-copy="#16252E">Copiar valor</button></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#53636d"></div><div class="swatch-info"><strong>Texto secundario</strong><code>--color-muted · #53636D</code><button data-copy="#53636D">Copiar valor</button></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#0e615a"></div><div class="swatch-info"><strong>Acento</strong><code>--color-accent · #0E615A</code><button data-copy="#0E615A">Copiar valor</button></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#0b4945"></div><div class="swatch-info"><strong>Acento oscuro</strong><code>--color-accent-dark · #0B4945</code><button data-copy="#0B4945">Copiar valor</button></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#d9eeea"></div><div class="swatch-info"><strong>Acento suave</strong><code>--color-accent-soft · #D9EEEA</code><button data-copy="#D9EEEA">Copiar valor</button></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#f6f4ee"></div><div class="swatch-info"><strong>Fondo</strong><code>--color-canvas · #F6F4EE</code><button data-copy="#F6F4EE">Copiar valor</button></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#fff1d6"></div><div class="swatch-info"><strong>Advertencia</strong><code>--color-warning-bg · #FFF1D6</code><button data-copy="#FFF1D6">Copiar valor</button></div></div>
+            <div class="swatch"><div class="swatch-color" style="background:#9b2c2c"></div><div class="swatch-info"><strong>Error</strong><code>--color-danger · #9B2C2C</code><button data-copy="#9B2C2C">Copiar valor</button></div></div>
+          </div>
+        </div>
+        <div class="token-group">
+          <div class="token-group-title"><h3>Tipografía</h3><span>Sistema local · sin dependencias externas</span></div>
+          <div class="panel">
+            <div class="type-sample"><span style="font:40px/1 Georgia,serif;letter-spacing:-.04em">10,7%</span><span>Dato protagonista · 56–64 px</span></div>
+            <div class="type-sample"><span style="font:30px/1 Georgia,serif">Título de sección</span><span>H2 · 27–38 px</span></div>
+            <div class="type-sample"><span style="font:700 16px system-ui">Título de componente</span><span>H3 · 16 px</span></div>
+            <div class="type-sample"><span style="font:14px system-ui">Texto de lectura y explicación</span><span>Cuerpo · 14–17 px</span></div>
+            <div class="type-sample"><span style="font:11px system-ui;color:#53636d">Fuente, nota y metadatos</span><span>Auxiliar · 10–12 px</span></div>
+            <p class="small-muted mt-16">Display: Georgia. Interfaz y lectura: Inter si está disponible; de lo contrario, tipografía de sistema. Cifras alineadas con números tabulares.</p>
+          </div>
+        </div>
+        <div class="token-group grid-2">
+          <div class="panel">
+            <div class="token-group-title"><h3>Espaciado</h3><span>Base de 4 px</span></div>
+            <div class="space-row"><code>space-1</code><div class="space-bar" style="width:4px"></div><span>4 px</span></div>
+            <div class="space-row"><code>space-2</code><div class="space-bar" style="width:8px"></div><span>8 px</span></div>
+            <div class="space-row"><code>space-3</code><div class="space-bar" style="width:12px"></div><span>12 px</span></div>
+            <div class="space-row"><code>space-4</code><div class="space-bar" style="width:16px"></div><span>16 px</span></div>
+            <div class="space-row"><code>space-5</code><div class="space-bar" style="width:24px"></div><span>24 px</span></div>
+            <div class="space-row"><code>space-6</code><div class="space-bar" style="width:32px"></div><span>32 px</span></div>
+            <div class="space-row"><code>space-7</code><div class="space-bar" style="width:48px"></div><span>48 px</span></div>
+          </div>
+          <div class="panel">
+            <div class="token-group-title"><h3>Grilla, bordes y superficies</h3><span>Layout responsive</span></div>
+            <p><strong>Ancho máximo:</strong> 1180 px.</p>
+            <p class="mt-16"><strong>Escritorio:</strong> índice lateral + contenido principal.</p>
+            <p class="mt-16"><strong>Móvil:</strong> una columna, navegación horizontal y controles a ancho disponible.</p>
+            <p class="mt-16"><strong>Radio:</strong> 8, 14 y 22 px.</p>
+            <p class="mt-16"><strong>Elevación:</strong> sombra tenue; separar secciones principalmente con bordes y espacio.</p>
+          </div>
+        </div>
+        <div class="token-group">
+          <div class="token-group-title"><h3>Contraste de tokens</h3><span>Relación calculada entre texto y fondo</span></div>
+          <div class="panel">
+            <div class="contrast-row"><span>Texto principal sobre blanco</span><span class="contrast-ratio">15,69:1</span><span class="tag">AA / AAA</span></div>
+            <div class="contrast-row"><span>Texto secundario sobre blanco</span><span class="contrast-ratio">6,23:1</span><span class="tag">AA / AAA</span></div>
+            <div class="contrast-row"><span>Acento sobre blanco</span><span class="contrast-ratio">7,30:1</span><span class="tag">AA / AAA</span></div>
+            <div class="contrast-row"><span>Acento oscuro sobre acento suave</span><span class="contrast-ratio">8,46:1</span><span class="tag">AA / AAA</span></div>
+            <div class="contrast-row"><span>Advertencia sobre fondo de advertencia</span><span class="contrast-ratio">6,64:1</span><span class="tag">AA / AAA</span></div>
+            <p class="small-muted mt-16">WCAG 2.2: se adopta como mínimo 4,5:1 para texto normal. La relación se calcula para las combinaciones declaradas; debe repetirse si se cambian los tokens.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="atomos">
+        <div class="section-head"><div><p class="section-kicker">04 · Piezas mínimas</p><h2>Átomos</h2><p class="section-intro">Elementos que no se dividen sin perder su función. Son la base de moléculas y organismos.</p></div><span class="section-number">04</span></div>
+        <div class="grid-2">
+          <article class="component-card"><h4>Botones</h4><p class="small-muted">Acciones explícitas: elegir, aplicar, volver o copiar.</p><div class="button-row mt-16"><button class="btn" type="button">Principal</button><button class="btn secondary" type="button">Secundario</button><button class="btn tertiary" type="button">Terciario</button><button class="btn" type="button" disabled>Deshabilitado</button></div><div class="component-rule"><p class="use"><strong>Úsalo para:</strong> acciones que producen un cambio visible.</p><p class="avoid"><strong>No lo uses para:</strong> decorar o simular enlaces.</p></div></article>
+          <article class="component-card"><h4>Enlaces y etiquetas</h4><p class="small-muted">Un enlace lleva a una fuente; una etiqueta describe un estado o categoría.</p><div class="button-row mt-16"><a href="https://www.ine.gob.cl/estadisticas-por-tema/mercado-laboral/ocupacion-y-desocupacion" target="_blank" rel="noopener">Consultar INE</a><span class="tag">Verificado</span><span class="tag neutral">Dato regional</span><span class="tag warning">Actualización pendiente</span></div><div class="component-rule"><p class="use"><strong>Úsalo para:</strong> navegación o clasificación breve.</p><p class="avoid"><strong>No lo uses para:</strong> reemplazar una explicación necesaria.</p></div></article>
+          <article class="component-card"><h4>Selector de región</h4><div class="field mt-16"><label for="region-atom">Región</label><select id="region-atom" aria-label="Ejemplo de selector de región"></select><small>Seleccionar cambia la ficha y la comparación.</small></div><div class="component-rule"><p class="use"><strong>Úsalo para:</strong> elegir una de las 16 regiones.</p><p class="avoid"><strong>No lo uses para:</strong> introducir comunas que la ENE no representa.</p></div></article>
+          <article class="component-card"><h4>Cifra y unidad</h4><div class="mt-16"><span style="font:52px/1 Georgia,serif;font-variant-numeric:tabular-nums">10,7%</span><p class="small-muted mt-16">Tasa de desocupación · porcentaje</p></div><div class="component-rule"><p class="use"><strong>Úsalo para:</strong> mostrar una estimación con unidad y contexto.</p><p class="avoid"><strong>No lo uses para:</strong> mostrar porcentajes sin período ni fuente.</p></div></article>
+        </div>
+      </section>
+
+      <section class="section" id="moleculas">
+        <div class="section-head"><div><p class="section-kicker">05 · Combinaciones funcionales</p><h2>Moléculas</h2><p class="section-intro">Átomos que trabajan juntos para resolver una tarea concreta del producto.</p></div><span class="section-number">05</span></div>
+        <div class="grid-2">
+          <article class="component-card">
+            <h4>Tarjeta de tasa regional</h4>
+            <div class="stat-card mt-16" id="molecule-stat"><span class="small-label">Tasa de desocupación · Biobío</span><div class="big-number" id="molecule-rate">10,7%</div><div class="detail" id="molecule-change">Aumentó 0,8 puntos porcentuales en doce meses.</div></div>
+            <div class="component-rule"><p class="use"><strong>Úsala para:</strong> responder la pregunta principal del producto.</p><p class="avoid"><strong>No la uses para:</strong> mostrar una cifra sin período ni región.</p></div>
+          </article>
+          <article class="component-card">
+            <h4>Comparación regional y nacional</h4>
+            <div class="comparison mt-16"><div class="compare-line"><span id="comparison-region-name">Biobío</span><div class="bar-track"><div class="bar-fill" id="comparison-region-bar"></div></div><strong id="comparison-region-rate">10,7%</strong></div><div class="compare-line"><span>Chile</span><div class="bar-track"><div class="bar-fill" id="comparison-national-bar" style="background:#8da59c"></div></div><strong id="comparison-national-rate">9,6%</strong></div><p class="small-muted" id="comparison-gap">Biobío está 1,1 pp. sobre el promedio nacional.</p></div>
+            <div class="component-rule"><p class="use"><strong>Úsala para:</strong> contextualizar la tasa regional.</p><p class="avoid"><strong>No la uses para:</strong> afirmar que una diferencia implica una causa.</p></div>
+          </article>
+          <article class="component-card"><h4>Línea de fuente</h4><div class="source-line mt-16"><p><strong id="source-name">INE · Boletín regional Biobío</strong><br><span id="source-period">Junio-agosto 2026 · publicado 30-09-2026</span></p><a id="source-link" href="https://www.ine.gob.cl/estadisticas-por-tema/mercado-laboral/ocupacion-y-desocupacion" target="_blank" rel="noopener">Ver fuente</a></div><div class="component-rule"><p class="use"><strong>Úsala para:</strong> acompañar cada cifra o tabla.</p><p class="avoid"><strong>No la uses para:</strong> citar solo «INE» sin boletín ni período.</p></div></article>
+          <article class="component-card"><h4>Nota de transparencia de IA</h4><div class="note mt-16"><strong>Cómo se elaboró:</strong> un agente automatiza el monitoreo y el primer procesamiento. Una persona revisa y aprueba antes de publicar.</div><div class="component-rule"><p class="use"><strong>Úsala para:</strong> explicar el rol de automatización y de la revisión humana.</p><p class="avoid"><strong>No la uses para:</strong> presentar a la IA como responsable editorial.</p></div></article>
+        </div>
+      </section>
+
+      <section class="section" id="organismos">
+        <div class="section-head"><div><p class="section-kicker">06 · Secciones completas</p><h2>Organismos</h2><p class="section-intro">Combinaciones de moléculas que componen las áreas principales del producto.</p></div><span class="section-number">06</span></div>
+        <div class="component-card mb-10">
+          <h4>Cabecera y navegación</h4>
+          <div class="panel soft mt-16"><div class="row" style="display:flex;justify-content:space-between;align-items:center;gap:12px"><div><strong>Mapa del Desempleo</strong><p class="small-muted">Chile · Encuesta Nacional de Empleo</p></div><span class="tag neutral">Datos del agente</span></div></div>
+          <div class="component-rule"><p class="use"><strong>Úsala para:</strong> identificar el producto y ofrecer acceso al índice o filtros.</p><p class="avoid"><strong>No la uses para:</strong> acumular enlaces secundarios antes de la cifra principal.</p></div>
+        </div>
+        <div class="grid-2">
+          <article class="component-card"><h4>Ficha de región</h4><div class="stat-card mt-16"><span class="small-label" id="organism-region-label">Biobío · último dato del agente</span><div class="big-number" id="organism-region-rate">10,7%</div><div class="detail" id="organism-region-summary">+0,8 pp. en doce meses · 1,1 pp. sobre Chile</div></div><div class="component-rule"><p class="use"><strong>Úsala para:</strong> entregar la respuesta de una región seleccionada.</p><p class="avoid"><strong>No la uses para:</strong> mezclar períodos o fuentes.</p></div></article>
+          <article class="component-card"><h4>Mapa de selección regional</h4><div class="map-layout mt-16"><div class="schematic-map"><div class="map-spine" id="map-spine" aria-label="Selector esquemático de las 16 regiones"></div><div class="map-labels"><strong>Norte</strong><span>↓</span><span>Centro</span><span>↓</span><span>Sur</span></div></div><div><p>Selecciona una región para actualizar la ficha, la comparación y la fila de la tabla.</p><div class="legend"><span class="legend-item"><i class="legend-chip" style="background:#e3f1ed"></i>4,0–6,9%</span><span class="legend-item"><i class="legend-chip" style="background:#b8d9d0"></i>7,0–8,9%</span><span class="legend-item"><i class="legend-chip" style="background:#6fa99a"></i>9,0–10,4%</span><span class="legend-item"><i class="legend-chip" style="background:#286e64"></i>10,5% o más</span></div></div></div><p class="small-muted mt-16">Esquema de navegación norte-sur, no representa límites administrativos ni reemplaza el mapa cartográfico definitivo.</p><div class="component-rule"><p class="use"><strong>Úsalo para:</strong> elegir y comparar una de las 16 regiones.</p><p class="avoid"><strong>No lo uses para:</strong> sugerir límites exactos con este esquema preliminar.</p></div></article>
+          <article class="component-card"><h4>Tabla de las 16 regiones</h4><label class="field mt-16"><span>Buscar región</span><input type="search" id="table-search" placeholder="Ej.: Biobío, Maule…"></label><div class="table-wrap mt-16"><table><thead><tr><th>Región</th><th style="text-align:right">Tasa</th><th style="text-align:right">Var. 12 meses</th></tr></thead><tbody id="regions-table"></tbody></table></div><div class="component-rule"><p class="use"><strong>Úsala para:</strong> comparar las regiones con las mismas definiciones y período.</p><p class="avoid"><strong>No la uses para:</strong> ordenar como ranking de territorios «buenos» o «malos».</p></div></article>
+          <article class="component-card"><h4>Bloque de explicación y pie editorial</h4><div class="panel soft mt-16"><span class="tag neutral">Nota del trimestre</span><h3 class="mt-16">Qué muestran estas cifras</h3><p>La tasa de desocupación estima la proporción de personas desocupadas dentro de la fuerza de trabajo. La variación interanual compara con el mismo trimestre móvil del año anterior.</p><hr style="border:0;border-top:1px solid var(--color-border);margin:14px 0"><p><strong>Transparencia:</strong> el agente automatiza el monitoreo y el borrador. La revisión, aprobación y responsabilidad editorial son humanas.</p></div><div class="component-rule"><p class="use"><strong>Úsalo para:</strong> entregar contexto metodológico y explicar responsabilidades.</p><p class="avoid"><strong>No lo uses para:</strong> inferir causas del desempleo a partir de una tasa agregada.</p></div></article>
+        </div>
+      </section>
+
+      <section class="section" id="plantillas">
+        <div class="section-head"><div><p class="section-kicker">07 · Composición de pantalla</p><h2>Plantillas y páginas</h2><p class="section-intro">La plantilla define la jerarquía sin datos. La página muestra esa misma estructura con el contenido del agente.</p></div><span class="section-number">07</span></div>
+        <div class="preview-controls" role="group" aria-label="Tamaño de vista previa">
+          <button class="preview-switch" type="button" data-preview="mobile" aria-pressed="true">Teléfono</button>
+          <button class="preview-switch" type="button" data-preview="desktop" aria-pressed="false">Escritorio</button>
+          <span class="small-muted">Primero se diseña móvil; luego se adapta.</span>
+        </div>
+        <div class="preview-stage mobile" id="preview-stage">
+          <div class="preview-screen">
+            <div class="preview-top"><span>MAPA DEL DESEMPLEO</span><span>CHILE · ENE</span></div>
+            <h3 class="preview-title">¿Cómo está el empleo en tu región?</h3>
+            <p class="preview-sub">Consulta el último período procesado por el agente.</p>
+            <div class="field mb-10"><label for="preview-region">Tu región</label><select id="preview-region"></select></div>
+            <div class="preview-metrics">
+              <div class="preview-primary"><span>TASA DE DESOCUPACIÓN · <b id="preview-region-name">BIOBÍO</b></span><strong id="preview-rate">10,7%</strong><small id="preview-change">+0,8 pp. en doce meses</small></div>
+              <div class="preview-secondary"><div class="mini-metric"><span>Promedio nacional</span><strong id="preview-national">9,6%</strong></div><div class="mini-metric"><span>Diferencia</span><strong id="preview-gap">+1,1 pp.</strong></div></div>
+            </div>
+            <div class="preview-map">Mapa de las 16 regiones · selector interactivo</div>
+            <div class="preview-foot" id="preview-source">Fuente: INE · Boletín 335 · Junio-agosto 2026 · 30-09-2026</div>
+          </div>
+        </div>
+        <div class="grid-2 mt-16">
+          <div class="panel"><h3>Plantilla vacía</h3><p>Cabecera → selector → tarjeta de tasa → cambio interanual → comparación nacional → mapa → fuente y aprobación. Los espacios y jerarquías se conservan aunque los datos aún no hayan cargado.</p></div>
+          <div class="panel"><h3>Página con datos</h3><p>La misma estructura se completa con el período y los valores entregados por GET /regiones. Cada dato mantiene su vínculo a la publicación oficial correspondiente.</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="estados">
+        <div class="section-head"><div><p class="section-kicker">08 · Comportamiento</p><h2>Estados</h2><p class="section-intro">No todos los momentos tienen datos disponibles. Cada estado debe comunicar qué ocurre y qué puede hacer la persona.</p></div><span class="section-number">08</span></div>
+        <div class="grid-2">
+          <article class="component-card state-card"><div class="spinner" aria-hidden="true"></div><h4>Cargando</h4><p>Estamos consultando los datos regionales del agente.</p></article>
+          <article class="component-card state-card"><div class="empty-dash" aria-hidden="true">—</div><h4>Sin datos</h4><p>Todavía no hay datos publicados para el período seleccionado.</p></article>
+          <article class="component-card state-card state-error"><span class="tag error" style="align-self:flex-start">Error de conexión</span><h4>No pudimos cargar los datos</h4><p>Revisa tu conexión e inténtalo nuevamente. La fuente oficial sigue disponible.</p><button class="btn secondary" type="button" id="retry-demo">Intentar conexión</button></article>
+          <article class="component-card state-card"><span class="tag neutral" style="align-self:flex-start">No consta</span><h4>Dato no disponible</h4><p>El INE no informa esta desagregación. No se estima ni se completa con otra fuente.</p></article>
+        </div>
+        <div class="token-group">
+          <div class="token-group-title"><h3>Estados de interacción</h3><span>Normal · hover · activo · foco · deshabilitado</span></div>
+          <div class="panel"><div class="button-row"><button class="btn" type="button">Normal</button><button class="btn" type="button">Pasa el cursor</button><button class="btn secondary" type="button" aria-pressed="true">Activo</button><button class="btn" type="button" disabled>Deshabilitado</button></div><p class="small-muted mt-16">Prueba con Tab para recorrer los controles y ver el foco visible. El foco no depende del color de fondo.</p></div>
+        </div>
+      </section>
+
+      <section class="section" id="datos-voz">
+        <div class="section-head"><div><p class="section-kicker">09 · Criterios editoriales</p><h2>Datos y voz</h2><p class="section-intro">Reglas para que una cifra signifique lo mismo en una tarjeta, una tabla, el mapa y una explicación.</p></div><span class="section-number">09</span></div>
+        <div class="grid-2">
+          <div class="panel"><h3>Reglas de datos</h3><div class="voice-list mt-16">
+            <div class="voice-item"><strong>Tasa</strong><span>Un decimal y signo %: <b>10,7%</b>.</span></div>
+            <div class="voice-item"><strong>Variación</strong><span>Puntos porcentuales (pp.), no porcentaje: <b>+0,8 pp.</b>.</span></div>
+            <div class="voice-item"><strong>Comparación</strong><span>Restar tasa regional menos tasa nacional: <b>+1,1 pp.</b>.</span></div>
+            <div class="voice-item"><strong>Período</strong><span>Nombrar trimestre móvil y año: <b>junio-agosto de 2026</b>.</span></div>
+            <div class="voice-item"><strong>Fuente</strong><span>Institución, número de boletín, fecha y enlace.</span></div>
+            <div class="voice-item"><strong>Ausencia</strong><span>Usar «No consta»; nunca inferir, interpolar o inventar.</span></div>
+          </div></div>
+          <div class="panel"><h3>Voz y microcopy</h3><div class="voice-list mt-16">
+            <div class="voice-item"><strong>Preferir</strong><span>«La tasa subió 0,8 puntos porcentuales».</span></div>
+            <div class="voice-item"><strong>Evitar</strong><span>«El desempleo se disparó» o «la situación es alarmante».</span></div>
+            <div class="voice-item"><strong>Preferir</strong><span>«Está 1,1 puntos porcentuales sobre el promedio nacional».</span></div>
+            <div class="voice-item"><strong>Evitar</strong><span>«A la región le va peor» sin explicar el indicador comparado.</span></div>
+            <div class="voice-item"><strong>Preferir</strong><span>«Último período incorporado por el agente» si hay desfase.</span></div>
+            <div class="voice-item"><strong>Evitar</strong><span>«Dato actualizado» cuando no se ha comprobado la vigencia.</span></div>
+          </div></div>
+        </div>
+        <div class="note mt-16"><strong>Regla de color del mapa:</strong> una sola familia cromática de claro a oscuro representa rangos de tasa. La leyenda siempre acompaña al mapa. El color no sustituye el valor escrito ni debe comunicar un juicio sobre la región.</div>
+      </section>
+
+      <section class="section" id="accesibilidad-ia">
+        <div class="section-head"><div><p class="section-kicker">10 · Uso responsable</p><h2>Accesibilidad e IA</h2><p class="section-intro">El sistema debe poder utilizarse con teclado, leerse con tecnologías de apoyo y explicar quién hizo qué.</p></div><span class="section-number">10</span></div>
+        <div class="grid-2">
+          <div class="panel"><h3>Accesibilidad</h3><div class="voice-list mt-16">
+            <div class="voice-item"><strong>Contraste</strong><span>Texto normal con relación mínima de 4,5:1.</span></div>
+            <div class="voice-item"><strong>Foco</strong><span>Indicador visible al navegar con teclado.</span></div>
+            <div class="voice-item"><strong>Teclado</strong><span>Selectores, enlaces y botones operables con Tab, Enter y flechas nativas.</span></div>
+            <div class="voice-item"><strong>Semántica</strong><span>Encabezados en orden, etiquetas asociadas y tablas con encabezados.</span></div>
+            <div class="voice-item"><strong>Alternativas</strong><span>El mapa tiene un selector y una tabla equivalentes; no depende solo de la imagen.</span></div>
+            <div class="voice-item"><strong>Movimiento</strong><span>Se respeta la preferencia de movimiento reducido del sistema operativo.</span></div>
+          </div></div>
+          <div class="panel"><h3>Declaración de uso de IA</h3><p>Para elaborar este sistema de diseño se utilizó ChatGPT como apoyo en la organización de las diez secciones, la redacción de reglas, la propuesta de tokens y la generación del código HTML, CSS y JavaScript inicial.</p><p class="mt-16">La definición del producto y sus decisiones editoriales corresponden a Paz Meza. Los datos de demostración se tomaron de la respuesta de GET /regiones compartida para este trabajo. Las cifras y su vigencia deben contrastarse con los boletines oficiales del INE antes de publicar.</p><p class="mt-16">La IA no aprueba contenidos, no firma publicaciones ni asume responsabilidad editorial. La revisión y aprobación final son humanas.</p><span class="tag mt-16">Declaración transparente</span></div>
+        </div>
+        <div class="note mt-16"><strong>Lo que no se negocia:</strong> no publicar cifras sin fuente; no confundir porcentaje con puntos porcentuales; no ocultar desfases de actualización; no atribuir causas que el INE no informa; no publicar sin aprobación humana.</div>
+      </section>
+
+    </main>
+  </div>
+  <footer class="footer">
+    <div class="footer-inner">
+      <div><strong>Mapa del Desempleo en Chile</strong><p>Sistema de diseño individual · Paz Meza · Electivo Agentes de IA para Periodismo · Universidad de Chile · 2026. Prototipo de documentación; no reemplaza la publicación ni la metodología del INE.</p></div>
+      <span class="small-muted" style="color:#c8d7d2">HTML · CSS · JavaScript en un archivo</span>
+    </div>
+  </footer>
+
+  <script>
+    // Datos de respaldo: transcripción fiel del GET /regiones compartido por Paz.
+    // El sistema intenta cargar el endpoint al abrirse. Si no responde, deja esta muestra identificada.
+    const API_URL = "https://ia-toolkit.paz-meza-o.workers.dev/regiones";
+    const fallbackPayload = {
+      trimestre: "junio-agosto 2026", fecha_publicacion: "2026-09-30", boletin: 335,
+      nacional: { tasa: 9.6, variacion_pp: 1.0, fuente: "INE, Boletín ENE n.º 335, 30-09-2026", url: "https://www.ine.gob.cl/docs/default-source/ocupacion-y-desocupacion/boletines/2026/nacional/ene-nacional-335.pdf" },
+      regiones: [
+        {region:"Aysén",codigo:"AI",tasa:4.0,variacion_pp:-0.3,tasa_hombres:4.0,tasa_mujeres:4.0,informalidad:27.5,fuente:"INE, Boletín estadístico: empleo trimestral, región Aysén, edición n.º 197, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-xi/estadisticas/ocupacion-y-desocupacion/boletines/2026/bolet%c3%adn-empleo-regi%c3%b3n-de-ays%c3%a9n-trimestre-m%c3%b3vil-junio---agosto-2026.pdf"},
+        {region:"Antofagasta",codigo:"AN",tasa:6.3,variacion_pp:-0.4,tasa_hombres:5.5,tasa_mujeres:7.5,informalidad:20.9,fuente:"INE, Boletín estadístico: empleo trimestral, región Antofagasta, edición n.º 136, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-ii/estadistica/ocupacion-y-desocupacion/boletines/2026/empleo-trimestre-m%c3%b3vil-junio---agosto-2026.pdf"},
+        {region:"Arica y Parinacota",codigo:"AP",tasa:9.4,variacion_pp:2.7,tasa_hombres:10.2,tasa_mujeres:8.4,informalidad:31.6,fuente:"INE, Boletín estadístico: empleo trimestral, región Arica y Parinacota, edición n.º 198, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-xv/estadisticas/ocupacion-y-desocupacion/boletines/2026/encuesta-nacional-de-empleo---ene-periodo-junio---agosto-2026.pdf"},
+        {region:"La Araucanía",codigo:"AR",tasa:10.1,variacion_pp:0.8,tasa_hombres:9.8,tasa_mujeres:10.5,informalidad:33.3,fuente:"INE, Boletín estadístico: empleo trimestral, región La Araucanía, edición n.º 198, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-ix/estadisticas/ocupacion-y-desocupacion/boletines/2026/boletin-empleo-jja2026.pdf"},
+        {region:"Atacama",codigo:"AT",tasa:9.5,variacion_pp:0.2,tasa_hombres:8.5,tasa_mujeres:10.7,informalidad:27.9,fuente:"INE, Boletín estadístico: empleo trimestral, región Atacama, edición n.º 198, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-iii/estadisticas/ocupacion-y-desocupacion/boletines/2026/ene---per%c3%adodo-junio---agosto-2026.pdf"},
+        {region:"Biobío",codigo:"BI",tasa:10.7,variacion_pp:0.8,tasa_hombres:10.3,tasa_mujeres:11.1,informalidad:27.9,fuente:"INE, Boletín estadístico: empleo trimestral, región Biobío, edición n.º 198, 30-09-2026",url:"https://regiones.ine.cl/documentos/default-source/region-viii/estadisticas/ocupacion-y-desocupacion/boletines/2026/bolet%c3%adn-empleo-biob%c3%ado-trimestre-m%c3%b3vil-junio-agosto-2026.pdf"},
+        {region:"Coquimbo",codigo:"CO",tasa:9.4,variacion_pp:1.8,tasa_hombres:9.0,tasa_mujeres:9.8,informalidad:28.1,fuente:"INE, Boletín estadístico: empleo trimestral, región Coquimbo, edición n.º 246, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-iv/estadisticas/ocupacion-y-desocupacion/boletines/2026/bolet%c3%adn-empleo-junio---agosto-2026.pdf"},
+        {region:"O'Higgins",codigo:"LI",tasa:10.8,variacion_pp:2.2,tasa_hombres:9.1,tasa_mujeres:13.2,informalidad:29.4,fuente:"INE, Boletín estadístico: empleo trimestral, región O'Higgins, edición n.º 186, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-vi/estadisticas/ocupacion-y-desocupacion/boletines/2026/bolet%c3%adn-regional-trimestre-m%c3%b3vil-junio-2026---julio-2026---agosto-2026.pdf"},
+        {region:"Los Lagos",codigo:"LL",tasa:7.8,variacion_pp:2.8,tasa_hombres:7.7,tasa_mujeres:7.9,informalidad:26.4,fuente:"INE, Boletín estadístico: empleo trimestral, región Los Lagos, edición n.º 293, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-x/estadisticas/ocupacion-y-desocupacion/boletines/2026/ene---periodo-junio---agosto-2026.pdf"},
+        {region:"Los Ríos",codigo:"LR",tasa:10.2,variacion_pp:1.1,tasa_hombres:9.9,tasa_mujeres:10.6,informalidad:32.3,fuente:"INE, Boletín estadístico: empleo trimestral, región Los Ríos, edición n.º 209, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-xiv/estadisticas/ocupacion-y-desocupacion/boletines/2026/bolet%c3%adn-empleo-trimestre-m%c3%b3vil-junio---agosto-2026.pdf"},
+        {region:"Magallanes",codigo:"MA",tasa:6.9,variacion_pp:0.7,tasa_hombres:6.1,tasa_mujeres:7.9,informalidad:20.9,fuente:"INE, Boletín estadístico: empleo trimestral, región Magallanes, edición n.º 198, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-xii/estadisticas/ocupacion-y-desocupacion/boletines/2026/emp_jja_2026_(3-0).pdf"},
+        {region:"Maule",codigo:"ML",tasa:9.5,variacion_pp:1.6,tasa_hombres:8.5,tasa_mujeres:10.7,informalidad:30.6,fuente:"INE, Boletín estadístico: empleo trimestral, región Maule, edición n.º 91, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-vii/estadisticas/ocupacion-y-desocupacion/boletines/2026/informe-empleo-junio-agosto-2026.pdf"},
+        {region:"Ñuble",codigo:"NB",tasa:11.2,variacion_pp:1.1,tasa_hombres:10.5,tasa_mujeres:12.0,informalidad:32.2,fuente:"INE, Boletín estadístico: empleo trimestral, región Ñuble, edición n.º 93, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-xvi/estadisticas/ocupacion-y-desocupacion/boletines/2026/bolet%c3%adn-empleo-regional-trimestre-m%c3%b3vil-junio---agosto-2026.pdf"},
+        {region:"Metropolitana",codigo:"RM",tasa:9.8,variacion_pp:0.9,tasa_hombres:9.4,tasa_mujeres:10.2,informalidad:23.4,fuente:"INE, Boletín estadístico: empleo trimestral, región Metropolitana de Santiago, edición n.º 123, 30-09-2026",url:"https://www.ine.gob.cl/docs/default-source/ocupacion-y-desocupacion/boletines/2026/rm/ene-rm-123.pdf"},
+        {region:"Tarapacá",codigo:"TA",tasa:7.8,variacion_pp:0.8,tasa_hombres:7.5,tasa_mujeres:8.2,informalidad:30.6,fuente:"INE, Boletín estadístico: empleo trimestral, región Tarapacá, edición n.º 198, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-i/estadisticas/ocupacion-y-desocupacion/boletines/2026/informe-de-empleo-junio---agosto-2026.pdf"},
+        {region:"Valparaíso",codigo:"VS",tasa:10.2,variacion_pp:1.4,tasa_hombres:9.3,tasa_mujeres:11.4,informalidad:28.6,fuente:"INE, Boletín estadístico: empleo trimestral, región Valparaíso, edición n.º 124, 30-09-2026",url:"https://regiones.ine.gob.cl/documentos/default-source/region-v/estadisticas/ocupacion-y-desocupacion/boletines/2026/bolet%c3%adn-empleo-regional-trimestre-m%c3%b3vil-junio---agosto-2026.pdf"}
+      ]
+    };
+
+    const regionOrder = ["Arica y Parinacota","Tarapacá","Antofagasta","Atacama","Coquimbo","Valparaíso","Metropolitana","O'Higgins","Maule","Ñuble","Biobío","La Araucanía","Los Ríos","Los Lagos","Aysén","Magallanes"];
+    let payload = fallbackPayload;
+    let selectedRegion = "Biobío";
+    let liveApiLoaded = false;
+    const $ = (id) => document.getElementById(id);
+    const fmt = (value) => Number(value).toLocaleString("es-CL", {minimumFractionDigits:1, maximumFractionDigits:1});
+    const fmtPP = (value) => `${value > 0 ? "+" : value < 0 ? "−" : ""}${fmt(Math.abs(value))} pp.`;
+    const getSelected = () => payload.regiones.find(r => r.region === selectedRegion) || payload.regiones[0];
+    const colorFor = (rate) => rate < 7 ? "#e3f1ed" : rate < 9 ? "#b8d9d0" : rate < 10.5 ? "#6fa99a" : "#286e64";
+    function setText(id, value) { const el = $(id); if (el) el.textContent = value; }
+    function fillSelectors() {
+      ["region-atom", "preview-region"].forEach(id => {
+        const el = $(id); if (!el) return;
+        const old = el.value;
+        el.innerHTML = payload.regiones.map(r => `<option value="${escapeHtml(r.region)}">${escapeHtml(r.region)}</option>`).join("");
+        el.value = payload.regiones.some(r => r.region === old) ? old : selectedRegion;
+      });
+    }
+    function escapeHtml(text) { return String(text).replace(/[&<>"']/g, ch => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[ch])); }
+    function renderSelection() {
+      const r = getSelected();
+      const gap = Number((r.tasa - payload.nacional.tasa).toFixed(1));
+      const direction = r.variacion_pp > 0 ? "Aumentó" : r.variacion_pp < 0 ? "Disminuyó" : "No cambió";
+      setText("molecule-rate", `${fmt(r.tasa)}%`);
+      setText("molecule-change", `${direction} ${fmt(Math.abs(r.variacion_pp))} puntos porcentuales en doce meses.`);
+      setText("comparison-region-name", r.region);
+      setText("comparison-region-rate", `${fmt(r.tasa)}%`);
+      setText("comparison-national-rate", `${fmt(payload.nacional.tasa)}%`);
+      setText("comparison-gap", gap === 0 ? "La tasa coincide con el promedio nacional." : `${r.region} está ${fmt(Math.abs(gap))} pp. ${gap > 0 ? "sobre" : "bajo"} el promedio nacional.`);
+      $("comparison-region-bar").style.width = `${Math.min(100, r.tasa / 14 * 100)}%`;
+      $("comparison-national-bar").style.width = `${Math.min(100, payload.nacional.tasa / 14 * 100)}%`;
+      setText("organism-region-label", `${r.region} · último dato del agente`);
+      setText("organism-region-rate", `${fmt(r.tasa)}%`);
+      setText("organism-region-summary", `${fmtPP(r.variacion_pp)} en doce meses · ${fmt(Math.abs(gap))} pp. ${gap >= 0 ? "sobre" : "bajo"} Chile`);
+      setText("preview-region-name", r.region.toLocaleUpperCase("es-CL"));
+      setText("preview-rate", `${fmt(r.tasa)}%`);
+      setText("preview-change", `${fmtPP(r.variacion_pp)} en doce meses`);
+      setText("preview-national", `${fmt(payload.nacional.tasa)}%`);
+      setText("preview-gap", `${gap > 0 ? "+" : gap < 0 ? "−" : ""}${fmt(Math.abs(gap))} pp.`);
+      setText("preview-source", `Fuente: INE · Boletín ${payload.boletin} · ${payload.trimestre} · ${payload.fecha_publicacion}`);
+      setText("source-name", r.fuente || `INE · ${r.region}`);
+      setText("source-period", `${payload.trimestre} · publicado ${payload.fecha_publicacion}`);
+      $("source-link").href = r.url || payload.nacional.url;
+      ["region-atom", "preview-region"].forEach(id => { if ($(id)) $(id).value = r.region; });
+      document.querySelectorAll(".map-region").forEach(btn => btn.classList.toggle("selected", btn.dataset.region === r.region));
+      renderTable($("table-search").value || "");
+    }
+    function renderMap() {
+      const spine = $("map-spine");
+      spine.innerHTML = regionOrder.map(name => {
+        const r = payload.regiones.find(x => x.region === name); if (!r) return "";
+        return `<button class="map-region" type="button" data-region="${escapeHtml(r.region)}" aria-label="Seleccionar ${escapeHtml(r.region)}: ${fmt(r.tasa)} por ciento" title="${escapeHtml(r.region)}: ${fmt(r.tasa)}%" style="background:${colorFor(r.tasa)}">${escapeHtml(r.codigo)}</button>`;
+      }).join("");
+      spine.querySelectorAll("button").forEach(btn => btn.addEventListener("click", () => selectRegion(btn.dataset.region)));
+    }
+    function renderTable(query = "") {
+      const q = query.trim().toLocaleLowerCase("es-CL");
+      const rows = payload.regiones.filter(r => r.region.toLocaleLowerCase("es-CL").includes(q));
+      $("regions-table").innerHTML = rows.map(r => `<tr class="${r.region === selectedRegion ? "selected-row" : ""}"><td><button class="table-select" type="button" data-region="${escapeHtml(r.region)}">${escapeHtml(r.region)}</button></td><td class="num">${fmt(r.tasa)}%</td><td class="num">${fmtPP(r.variacion_pp)}</td></tr>`).join("") || `<tr><td colspan="3">No encontramos esa región.</td></tr>`;
+      $("regions-table").querySelectorAll("button[data-region]").forEach(btn => btn.addEventListener("click", () => selectRegion(btn.dataset.region)));
+    }
+    function selectRegion(name) { selectedRegion = name; renderSelection(); }
+    async function loadAgentData() {
+      try {
+        const response = await fetch(API_URL, {headers:{"Accept":"application/json"}, cache:"no-store"});
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const incoming = await response.json();
+        if (!incoming || !Array.isArray(incoming.regiones) || !incoming.nacional) throw new Error("Formato de respuesta inesperado");
+        payload = incoming; liveApiLoaded = true;
+        selectedRegion = payload.regiones.some(r => r.region === "Biobío") ? "Biobío" : payload.regiones[0].region;
+        fillSelectors(); renderMap(); renderSelection();
+        document.documentElement.dataset.dataSource = "api";
+        const statusText = document.querySelector(".status-inner p");
+        if (Number(payload.boletin) < 336) {
+          statusText.innerHTML = `El endpoint respondió correctamente y entrega el Boletín ${escapeHtml(payload.boletin)} (${escapeHtml(payload.trimestre)}; publicación ${escapeHtml(payload.fecha_publicacion)}). El INE ya publicó el Boletín 336 el 29-10-2026. La interfaz identifica el período recibido para no presentarlo como el más reciente. <a href="https://regiones.ine.gob.cl/documentos/default-source/region-viii/estadisticas/ocupacion-y-desocupacion/boletines/2026/boletin-empleo-biobio-trimestre-movil-julio-septiembre-2026.pdf" target="_blank" rel="noopener">Boletín regional 336</a> · <a href="https://www.ine.gob.cl/sala-de-prensa/prensa/general/noticia/2026/10/29/la-tasa-de-desocupaci%C3%B3n-nacional-fue-9-8-en-el-trimestre-julio-septiembre-de-2026" target="_blank" rel="noopener">Boletín nacional 336</a>.`;
+        } else {
+          document.querySelector(".status-inner").style.display = "none";
+        }
+      } catch (error) {
+        // Se mantiene el respaldo local y se informa que no se obtuvo una conexión en vivo.
+        document.documentElement.dataset.dataSource = "respaldo";
+        const status = document.querySelector(".status-inner p");
+        status.innerHTML = `No se pudo consultar el endpoint durante esta carga. La página muestra el respaldo local tomado de la respuesta compartida por Paz: Boletín ${fallbackPayload.boletin}, ${fallbackPayload.trimestre}. <strong>No es una confirmación de datos en vivo.</strong> Comprueba la conexión antes de publicar.`;
+      }
+    }
+    document.querySelectorAll("[data-copy]").forEach(button => button.addEventListener("click", async () => {
+      const value = button.dataset.copy;
+      try { await navigator.clipboard.writeText(value); button.textContent = "Copiado"; }
+      catch { button.textContent = value; }
+      window.setTimeout(() => button.textContent = "Copiar valor", 1600);
+    }));
+    $("region-atom").addEventListener("change", e => selectRegion(e.target.value));
+    $("preview-region").addEventListener("change", e => selectRegion(e.target.value));
+    $("table-search").addEventListener("input", e => renderTable(e.target.value));
+    document.querySelectorAll("[data-preview]").forEach(button => button.addEventListener("click", () => {
+      const mobile = button.dataset.preview === "mobile";
+      $("preview-stage").classList.toggle("mobile", mobile);
+      document.querySelectorAll("[data-preview]").forEach(b => b.setAttribute("aria-pressed", String(b === button)));
+    }));
+    $("retry-demo").addEventListener("click", async () => {
+      const button = $("retry-demo");
+      button.textContent = "Consultando…";
+      button.disabled = true;
+      await loadAgentData();
+      button.textContent = liveApiLoaded ? "Conexión comprobada" : "No se pudo conectar";
+      window.setTimeout(() => { button.textContent = "Intentar conexión"; button.disabled = false; }, 1800);
+    });
+    const observer = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        document.querySelectorAll(".nav-list a").forEach(a => a.classList.toggle("active", a.getAttribute("href") === `#${entry.target.id}`));
+      }
+    }), {rootMargin:"-15% 0px -70% 0px"});
+    document.querySelectorAll("main .section").forEach(section => observer.observe(section));
+    fillSelectors(); renderMap(); renderSelection();
+    loadAgentData();
+  </script>
+</body>
+</html>
